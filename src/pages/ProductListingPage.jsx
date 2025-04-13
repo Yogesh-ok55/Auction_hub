@@ -15,6 +15,8 @@ const ProductListingPage = () => {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 })
   const [showFilters, setShowFilters] = useState(false)
 
+  
+
   // Extract unique categories from products
   const categories = [...new Set(products.map((product) => product.category))]
 

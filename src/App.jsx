@@ -13,12 +13,13 @@ import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import CreateListingPage from "./pages/CreateListingPage"
 import NotificationCenter from "./components/NotificationCenter"
+import PrivateRoute from "./components/ProtectiveRoute"
 import "./App.css"
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
+      
         <ProductProvider>
           <NotificationProvider>
             <div className="flex flex-col min-h-screen bg-gray-50">
@@ -27,19 +28,26 @@ function App() {
               <main className="flex-grow">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
-                  <Route path="/products" element={<ProductListingPage />} />
-                  <Route path="/products/:id" element={<ProductDetailPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/products" element={<PrivateRoute><ProductListingPage />
+                    </PrivateRoute>} />
+                  <Route path="/products/:id" element={
+                    <PrivateRoute><ProductDetailPage /></PrivateRoute>
+                  } />
+                  <Route path="/profile" element={
+                    <PrivateRoute><ProfilePage /></PrivateRoute>
+                  } />
+                  <Route path="/create-listing" element={
+                    <PrivateRoute><CreateListingPage /></PrivateRoute>
+                  } />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
-                  <Route path="/create-listing" element={<CreateListingPage />} />
                 </Routes>
               </main>
               <Footer />
             </div>
           </NotificationProvider>
         </ProductProvider>
-      </AuthProvider>
+      
     </Router>
   )
 }

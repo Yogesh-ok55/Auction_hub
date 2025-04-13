@@ -7,49 +7,62 @@ const AuthContext = createContext()
 export const useAuth = () => useContext(AuthContext)
 
 export const AuthProvider = ({ children }) => {
+  const [isLogin,setIsLogin] = useState(false);
   const [currentUser, setCurrentUser] = useState(true)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  // Simulate fetching user from localStorage on initial load
+  
   useEffect(() => {
-    const user = localStorage.getItem("user")
-    if (user) {
-      setCurrentUser(JSON.parse(user))
+   console.log()
+    const verifyUser = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/auth/tokenVerify", {
+          method: "POST",
+          credentials: "include", 
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          console.log("hello");
+          setIsLogin(true)
+          setCurrentUser(data) 
+        } else {
+          setIsLogin(false)
+          setCurrentUser(null)
+        }
+      } catch (error) {
+        console.error("Auth verification error:", error)
+        setIsLogin(false)
+      } finally {
+        setLoading(false)
+        
+      }
     }
-    setLoading(false)
+
+    verifyUser()
+    console.log(isLogin+" "+"in auth")
+    
   }, [])
 
-  // Login function
-  const login = (userData) => {
-    // In a real app, you would make an API call here
-    setCurrentUser(userData)
-    localStorage.setItem("user", JSON.stringify(userData))
-    return true
-  }
+  useEffect(() => {
+    console.log("isLogin changed:", isLogin)
+  }, [isLogin])
 
-  // Register function
-  const register = (userData) => {
-    // In a real app, you would make an API call here
-    const newUser = {
-      ...userData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    }
-    setCurrentUser(newUser)
-    localStorage.setItem("user", JSON.stringify(newUser))
-    return true
-  }
+  
+
+  
 
   // Logout function
   const logout = () => {
-    setCurrentUser(null)
-    localStorage.removeItem("user")
+   
+    
   }
 
   const value = {
     currentUser,
-    login,
-    register,
+    setCurrentUser,
+    isLogin,
+    setIsLogin,
     logout,
     loading,
   }

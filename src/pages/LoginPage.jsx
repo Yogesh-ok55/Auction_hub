@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { useState } from "react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { Link, useNavigate, useLocation,Navigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useAuth } from "../contexts/AuthContext"
 import { FiMail, FiLock, FiAlertCircle } from "react-icons/fi"
@@ -14,7 +14,7 @@ const LoginPage = () => {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { login } = useAuth()
+  const { setIsLogin , setCurrentUser ,isLogin} = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -39,6 +39,7 @@ const LoginPage = () => {
          headers:{
           "Content-Type":"application/json"
          },
+         credentials: "include",
          body:JSON.stringify({
           email,
           password
@@ -52,9 +53,15 @@ const LoginPage = () => {
         toast.error(errorMessage)
         return ;
       }
+
+      
       
       const data = await response.json();
       toast.success("Logged in successfully!")
+      setIsLogin(true);
+      console.log(isLogin)
+      setCurrentUser(data.message);
+      navigate("/products")
       console.log(data);
       
     } catch (err) {

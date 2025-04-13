@@ -13,11 +13,22 @@ const Navbar = () => {
   const { notifications } = useNotifications()
   const navigate = useNavigate()
 
+  const {setIsLogin} = useAuth()
+
   const unreadNotifications = notifications.filter((n) => !n.read).length
 
-  const handleLogout = () => {
-    logout()
-    navigate("/")
+  const handleLogout = async() => {
+    try {
+      await fetch("http://localhost:5000/auth/logout", {
+        method: "POST",
+        credentials: "include", // Very important to include cookies
+      });
+  
+      setIsLogin(false);
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   }
 
   return (
