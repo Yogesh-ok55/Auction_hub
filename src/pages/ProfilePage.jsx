@@ -1,6 +1,5 @@
 "use client"
-import React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useAuth } from "../contexts/AuthContext"
@@ -9,11 +8,12 @@ import ProductCard from "../components/ProductCard"
 import { FiUser, FiPackage, FiHeart, FiSettings, FiLogOut, FiPlus } from "react-icons/fi"
 
 const ProfilePage = () => {
-  const { currentUser, logout } = useAuth()
+  const { currentUser, logout ,setCurrentUser} = useAuth()
   const { products, getProductsBySeller, getBidProducts } = useProducts()
   const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState("listings")
+  const [profileImage, setProfileImage] = useState(null)
 
   // Redirect if not logged in
   if (!currentUser) {
@@ -29,19 +29,72 @@ const ProfilePage = () => {
     navigate("/")
   }
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0]
+
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('http://localhost:5000/upload/profileImage', {
+        method: 'POST',
+        body: formData,
+        credentials:"include"
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Image uploaded successfully:', data.url);
+        setProfileImage(data.url);
+        setCurrentUser((Prop)=>({
+          ...Prop,
+          profile_pic:data.url
+        }))
+      } else {
+        console.error('Upload failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+    
+  
+
   return (
+    
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Sidebar */}
         <div className="md:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="flex flex-col items-center text-center mb-6">
-              <div className="h-24 w-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold mb-4">
-                {currentUser.username ? currentUser.username.charAt(0).toUpperCase() : <FiUser className="h-12 w-12" />}
-              </div>
-              <h2 className="text-xl font-semibold">{currentUser.username || "User"}</h2>
+              <label htmlFor="profile-upload" className="cursor-pointer relative">
+                {currentUser.profile_pic ? (
+                  <img
+                    src={currentUser.profile_pic}
+                    alt="Profile"
+                    className="h-24 w-24 rounded-full object-cover border-2 border-indigo-500"
+                  />
+                ) : (
+                  <div className="h-24 w-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold">
+                    {currentUser.username ? currentUser.username.charAt(0).toUpperCase() : <FiUser className="h-12 w-12" />}
+                  </div>
+                )}
+                <input
+                  type="file"
+                  id="profile-upload"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
+              <h2 className="text-xl font-semibold mt-3">{currentUser.username || "User"}</h2>
               <p className="text-gray-500 text-sm">
-                Member since {new Date(currentUser.createdAt).toLocaleDateString()}
+                {currentUser.email}
               </p>
             </div>
 
@@ -163,8 +216,9 @@ const ProfilePage = () => {
                       type="text"
                       id="username"
                       name="username"
+                      disabled={true}
                       defaultValue={currentUser.username || ""}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 bg-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
@@ -176,8 +230,9 @@ const ProfilePage = () => {
                       type="email"
                       id="email"
                       name="email"
+                      disabled={true}
                       defaultValue={currentUser.email || ""}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      className="mt-1 block w-full border border-gray-300 bg-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
 
@@ -232,4 +287,3 @@ const ProfilePage = () => {
 }
 
 export default ProfilePage
-

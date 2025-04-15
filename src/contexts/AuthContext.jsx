@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
           const data = await res.json()
           console.log("hello");
           setIsLogin(true)
-          setCurrentUser(data) 
+          setCurrentUser(data.userData) 
         } else {
           setIsLogin(false)
           setCurrentUser(null)

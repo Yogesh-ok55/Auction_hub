@@ -116,7 +116,7 @@ export const ProductProvider = ({ children }) => {
     fetchProducts()
   }, [])
 
-  // Create a new product listing
+  
   const createListing = (productData) => {
     if (!currentUser) return false
 

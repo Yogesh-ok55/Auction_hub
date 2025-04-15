@@ -60,8 +60,8 @@ const LoginPage = () => {
       toast.success("Logged in successfully!")
       setIsLogin(true);
       console.log(isLogin)
-      setCurrentUser(data.message);
-      navigate("/products")
+      setCurrentUser(data.userData);
+      navigate("/profile")
       console.log(data);
       
     } catch (err) {
