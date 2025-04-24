@@ -14,124 +14,69 @@ export const ProductProvider = ({ children }) => {
 
   // Simulate fetching products from an API
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        // In a real app, you would fetch from an API
-        const mockProducts = [
-          {
-            id: "1",
-            title: "Vintage Camera",
-            description: "A beautiful vintage camera in excellent condition.",
-            images: [
-              "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            ],
-            startingBid: 50,
-            currentBid: 65,
-            seller: "user123",
-            endTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            bids: [
-              { userId: "user456", amount: 55, time: "2023-01-01T10:00:00Z" },
-              { userId: "user789", amount: 65, time: "2023-01-01T11:00:00Z" },
-            ],
-            category: "Electronics",
-          },
-          {
-            id: "2",
-            title: "Leather Jacket",
-            description: "Genuine leather jacket, barely worn.",
-            images: [
-              "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            ],
-            startingBid: 100,
-            currentBid: 120,
-            seller: "user456",
-            endTime: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
-            bids: [
-              { userId: "user123", amount: 110, time: "2023-01-02T10:00:00Z" },
-              { userId: "user789", amount: 120, time: "2023-01-02T11:00:00Z" },
-            ],
-            category: "Fashion",
-          },
-          {
-            id: "3",
-            title: "Antique Watch",
-            description: "Rare antique watch from the 1920s, still works perfectly.",
-            images: [
-              "https://images.unsplash.com/photo-1524805444758-089113d48a6d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            ],
-            startingBid: 200,
-            currentBid: 250,
-            seller: "user789",
-            endTime: new Date(Date.now() + 36 * 60 * 60 * 1000).toISOString(),
-            bids: [
-              { userId: "user123", amount: 220, time: "2023-01-03T10:00:00Z" },
-              { userId: "user456", amount: 250, time: "2023-01-03T11:00:00Z" },
-            ],
-            category: "Jewelry",
-          },
-          {
-            id: "4",
-            title: "Gaming Console",
-            description: "Latest gaming console with two controllers and 3 games.",
-            images: [
-              "https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            ],
-            startingBid: 300,
-            currentBid: 350,
-            seller: "user123",
-            endTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-            bids: [
-              { userId: "user456", amount: 320, time: "2023-01-04T10:00:00Z" },
-              { userId: "user789", amount: 350, time: "2023-01-04T11:00:00Z" },
-            ],
-            category: "Electronics",
-          },
-          {
-            id: "5",
-            title: "Handmade Pottery Set",
-            description: "Beautiful handmade pottery set with 4 plates, 4 bowls, and 4 mugs.",
-            images: [
-              "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-            ],
-            startingBid: 80,
-            currentBid: 95,
-            seller: "user456",
-            endTime: new Date(Date.now() + 60 * 60 * 60 * 1000).toISOString(),
-            bids: [
-              { userId: "user123", amount: 85, time: "2023-01-05T10:00:00Z" },
-              { userId: "user789", amount: 95, time: "2023-01-05T11:00:00Z" },
-            ],
-            category: "Home & Garden",
-          },
-        ]
-
-        setProducts(mockProducts)
-        setLoading(false)
-      } catch (error) {
-        console.error("Error fetching products:", error)
-        setLoading(false)
-      }
-    }
+    
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch("http://localhost:5000/upload/getProduct"); 
+          const data = await response.json();
+          console.log(data.products)
+          setProducts(data.products);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+          setLoading(false);
+        }
+      };
+    
+      fetchProducts();
 
     fetchProducts()
   }, [])
 
   
-  const createListing = (productData) => {
-    if (!currentUser) return false
+  const createListing = async (productData) => {
+    if (!currentUser) return false;
 
-    const newProduct = {
-      ...productData,
-      id: Date.now().toString(),
-      seller: currentUser.id,
-      currentBid: productData.startingBid,
-      bids: [],
-      endTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
-      createdAt: new Date().toISOString(),
+    const formData = new FormData();
+
+    // Loop through the properties of productData and append them to FormData
+    Object.keys(productData).forEach((key) => {
+        if (key !== 'images') {
+            formData.append(key, productData[key]);  // Append other fields
+        }
+    });
+
+    // Handle images (add only the first image from the array)
+    if (productData.images) {
+        formData.append('image', productData.images);  // Append the first image file
     }
 
-    setProducts([...products, newProduct])
-    return newProduct
+    // Additionally append seller_id
+    formData.append('seller_id', currentUser.id);
+
+    console.log(formData)
+
+    try {
+        const response = await fetch('http://localhost:5000/upload/productListings', {
+            method: 'POST',
+            body: formData,  
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to create product');
+        }
+
+        const res= await response.json();
+        
+        console.log(res.data);
+        setProducts((prevProducts) => [...prevProducts, res.data]);
+
+          
+        return res.data;
+    } catch (error) {
+        console.error('Error creating product:', error);
+        return false;
+    }
   }
 
   // Place a bid on a product

@@ -5,10 +5,11 @@ import { motion } from "framer-motion"
 import { useProducts } from "../contexts/ProductContext"
 import ProductCard from "../components/ProductCard"
 import { FiArrowRight, FiPackage, FiClock, FiShield } from "react-icons/fi"
+import { useAuth } from "../contexts/AuthContext"
 
 const HomePage = () => {
   const { products, loading } = useProducts()
-
+  const { currentUser } = useAuth()
   // Get featured products (first 4)
   const featuredProducts = products.slice(0, 4)
 
@@ -147,6 +148,7 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
+      {!currentUser && 
       <section className="bg-indigo-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Bidding?</h2>
@@ -164,6 +166,7 @@ const HomePage = () => {
           </Link>
         </div>
       </section>
+      }
     </div>
   )
 }

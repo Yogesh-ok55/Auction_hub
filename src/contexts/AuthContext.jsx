@@ -1,6 +1,9 @@
 "use client"
 import React from "react"
+
 import { createContext, useState, useEffect, useContext } from "react"
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../components/Firebase";
 
 const AuthContext = createContext()
 
@@ -58,6 +61,17 @@ export const AuthProvider = ({ children }) => {
     
   }
 
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("User Info:", user);
+      // You can store the user data or navigate to a dashboard
+    } catch (error) {
+      console.error("Error during sign-in:", error.message);
+    }
+  };
+
   const value = {
     currentUser,
     setCurrentUser,
@@ -65,6 +79,7 @@ export const AuthProvider = ({ children }) => {
     setIsLogin,
     logout,
     loading,
+    handleGoogleLogin
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -14,7 +14,7 @@ const LoginPage = () => {
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { setIsLogin , setCurrentUser ,isLogin} = useAuth()
+  const { setIsLogin , setCurrentUser ,isLogin,handleGoogleLogin} = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -61,7 +61,9 @@ const LoginPage = () => {
       setIsLogin(true);
       console.log(isLogin)
       setCurrentUser(data.userData);
-      navigate("/profile")
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
       console.log(data);
       
     } catch (err) {
@@ -187,7 +189,7 @@ const LoginPage = () => {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-3 flex-col justify-center items-center">
+          <div className="mt-6 grid grid-cols-1 gap-3 flex-col justify-center items-center" onClick={handleGoogleLogin}>
             <div>
               <a
                 href="#"

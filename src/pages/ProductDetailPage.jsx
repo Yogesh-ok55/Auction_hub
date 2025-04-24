@@ -103,7 +103,7 @@ const ProductDetailPage = () => {
         <div>
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="flex justify-between items-start">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">{products.title}</h1>
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -116,22 +116,22 @@ const ProductDetailPage = () => {
 
             <div className="flex items-center text-sm text-gray-600 mb-4">
               <FiTag className="mr-1" />
-              <span>{product.category}</span>
+              <span>{products.category}</span>
             </div>
 
             <div className="border-t border-b py-4 my-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <FiDollarSign className="mr-1 text-indigo-600" />
-                  <span className="text-2xl font-bold text-indigo-600">${product.currentBid}</span>
+                  <span className="text-2xl font-bold text-indigo-600">${products.currentBid}</span>
                 </div>
-                <div className="text-sm text-gray-600">Starting bid: ${product.startingBid}</div>
+                <div className="text-sm text-gray-600">Starting bid: ${products.startingBid}</div>
               </div>
 
               <div className="flex items-center text-sm text-gray-600 mb-2">
                 <FiUser className="mr-1" />
                 <span>
-                  {product.bids.length} {product.bids.length === 1 ? "bid" : "bids"}
+                  {products.bids.length} {products.bids.length === 1 ? "bid" : "bids"}
                 </span>
               </div>
 
@@ -142,14 +142,14 @@ const ProductDetailPage = () => {
 
               {!isAuctionEnded && (
                 <div className="mt-4">
-                  <AuctionTimer endTime={product.endTime} />
+                  <AuctionTimer endTime />
                 </div>
               )}
             </div>
 
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-2">Description</h3>
-              <p className="text-gray-700">{product.description}</p>
+              <p className="text-gray-700">{products.description}</p>
             </div>
 
             {isAuctionEnded ? (
@@ -157,28 +157,28 @@ const ProductDetailPage = () => {
                 <h3 className="text-lg font-semibold mb-2">Auction Ended</h3>
                 {isCurrentUserHighestBidder ? (
                   <div className="text-green-600">
-                    Congratulations! You won this auction with a bid of ${product.currentBid}.
+                    Congratulations! You won this auction with a bid of ${products.currentBid}.
                     <button className="mt-4 w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700">
                       Proceed to Payment
                     </button>
                   </div>
                 ) : (
-                  <p className="text-gray-700">This auction has ended. The item sold for ${product.currentBid}.</p>
+                  <p className="text-gray-700">This auction has ended. The item sold for ${products.currentBid}.</p>
                 )}
               </div>
             ) : (
-              <BidForm product={product} />
+              <BidForm product={products} />
             )}
           </div>
 
           {/* Bid History */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold mb-4">Bid History</h3>
-            {product.bids.length === 0 ? (
+            {products.bids.length === 0 ? (
               <p className="text-gray-600">No bids yet. Be the first to bid!</p>
             ) : (
               <ul className="divide-y divide-gray-200">
-                {[...product.bids]
+                {[...products.bids]
                   .sort((a, b) => new Date(b.time) - new Date(a.time))
                   .map((bid, index) => (
                     <li key={index} className="py-3 flex justify-between">

@@ -20,6 +20,8 @@ const RegisterPage = () => {
   const [isEmailDisabled, setIsEmailDisabled] = useState(false); // For disabling email after OTP
   const navigate = useNavigate();
 
+  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -140,7 +142,9 @@ const RegisterPage = () => {
       let data = await response.json();
       toast.success("Registration successful!");
       console.log(data);
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       const message = err.message || "Some unknown error";
       toast.error(message);

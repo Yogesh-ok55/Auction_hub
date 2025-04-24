@@ -5,13 +5,13 @@ import { motion } from "framer-motion"
 import { useAuth } from "../contexts/AuthContext"
 import { useProducts } from "../contexts/ProductContext"
 import ProductCard from "../components/ProductCard"
-import { FiUser, FiPackage, FiHeart, FiSettings, FiLogOut, FiPlus } from "react-icons/fi"
+import { FiUser, FiPackage, FiHeart, FiSettings, FiLogOut, FiPlus, FiEdit2 } from "react-icons/fi"
 
 const ProfilePage = () => {
-  const { currentUser, logout ,setCurrentUser} = useAuth()
+  const { currentUser, logout, setCurrentUser } = useAuth()
   const { products, getProductsBySeller, getBidProducts } = useProducts()
   const navigate = useNavigate()
-
+  const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("listings")
   const [profileImage, setProfileImage] = useState(null)
 
@@ -31,7 +31,7 @@ const ProfilePage = () => {
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0]
-
+    
     if (!file) return;
 
     const formData = new FormData();
@@ -41,7 +41,7 @@ const ProfilePage = () => {
       const response = await fetch('http://localhost:5000/upload/profileImage', {
         method: 'POST',
         body: formData,
-        credentials:"include"
+        credentials: "include"
       });
 
       const data = await response.json();
@@ -49,9 +49,9 @@ const ProfilePage = () => {
       if (response.ok) {
         console.log('Image uploaded successfully:', data.url);
         setProfileImage(data.url);
-        setCurrentUser((Prop)=>({
+        setCurrentUser((Prop) => ({
           ...Prop,
-          profile_pic:data.url
+          profile_pic: data.url
         }))
       } else {
         console.error('Upload failed:', data.error);
@@ -60,30 +60,56 @@ const ProfilePage = () => {
       console.error('Error uploading image:', error);
     }
   };
-    
-  
+
+
 
   return (
-    
+
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Sidebar */}
         <div className="md:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="flex flex-col items-center text-center mb-6">
-              <label htmlFor="profile-upload" className="cursor-pointer relative">
+              <div className="relative group w-24 h-24">
                 {currentUser.profile_pic ? (
-                  <img
-                    src={currentUser.profile_pic}
-                    alt="Profile"
-                    className="h-24 w-24 rounded-full object-cover border-2 border-indigo-500"
-                  />
+                  <>
+                    
+                    <img
+                      src={currentUser.profile_pic}
+                      alt="Profile"
+                      onClick={() => setShowModal(true)}
+                      className="h-24 w-24 rounded-full object-cover border-2 border-indigo-500 cursor-pointer"
+                    />
+
+                    
+                    <label
+                      htmlFor="profile-upload"
+                      className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow-md cursor-pointer"
+                    >
+                      <FiEdit2 className="h-5 w-5 text-indigo-600" />
+                    </label>
+                  </>
                 ) : (
                   <div className="h-24 w-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold">
-                    {currentUser.username ? currentUser.username.charAt(0).toUpperCase() : <FiUser className="h-12 w-12" />}
+                    {currentUser.username ? (
+                      <>
+                      {currentUser.username.charAt(0).toUpperCase()}
+                      <label
+                      htmlFor="profile-upload"
+                      className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow-md cursor-pointer"
+                    >
+                      <FiEdit2 className="h-5 w-5 text-indigo-600" />
+                    </label>
+                      </>
+                    ) : (
+                      <FiUser className="h-12 w-12" />
+                    )}
                   </div>
                 )}
+
+                
                 <input
                   type="file"
                   id="profile-upload"
@@ -91,7 +117,44 @@ const ProfilePage = () => {
                   onChange={handleImageChange}
                   className="hidden"
                 />
-              </label>
+              </div>
+
+              {/* Modal for full image view */}
+              {showModal && currentUser.profile_pic && (
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                  <div className="relative">
+                    <img
+                      src={currentUser.profile_pic}
+                      alt="Full Size"
+                      className="max-w-[90vw] max-h-[90vh] rounded-xl shadow-lg"
+                    />
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full px-2 py-1 text-sm hover:bg-opacity-80"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {showModal && currentUser.profile_pic && (
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+                  <div className="relative">
+                    <img
+                      src={currentUser.profile_pic}
+                      alt="Full Size"
+                      className="max-w-[90vw] max-h-[90vh] rounded-xl shadow-lg"
+                    />
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full px-2 py-1 text-sm hover:bg-opacity-80"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
               <h2 className="text-xl font-semibold mt-3">{currentUser.username || "User"}</h2>
               <p className="text-gray-500 text-sm">
                 {currentUser.email}
@@ -101,27 +164,24 @@ const ProfilePage = () => {
             <nav className="space-y-2">
               <button
                 onClick={() => setActiveTab("listings")}
-                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${
-                  activeTab === "listings" ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${activeTab === "listings" ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
+                  }`}
               >
                 <FiPackage className="mr-3 h-5 w-5" />
                 My Listings
               </button>
               <button
                 onClick={() => setActiveTab("bids")}
-                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${
-                  activeTab === "bids" ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${activeTab === "bids" ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
+                  }`}
               >
                 <FiHeart className="mr-3 h-5 w-5" />
                 My Bids
               </button>
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${
-                  activeTab === "settings" ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${activeTab === "settings" ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-50"
+                  }`}
               >
                 <FiSettings className="mr-3 h-5 w-5" />
                 Account Settings

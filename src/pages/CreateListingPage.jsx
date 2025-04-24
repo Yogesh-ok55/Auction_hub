@@ -6,6 +6,8 @@ import { motion } from "framer-motion"
 import { useProducts } from "../contexts/ProductContext"
 import { useAuth } from "../contexts/AuthContext"
 import { FiUpload, FiDollarSign, FiAlertCircle, FiX } from "react-icons/fi"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateListingPage = () => {
   const navigate = useNavigate()
@@ -16,7 +18,7 @@ const CreateListingPage = () => {
     title: "",
     description: "",
     category: "",
-    startingBid: "",
+    starting_bid: 0,
     images: [],
   })
 
@@ -46,13 +48,11 @@ const CreateListingPage = () => {
   }
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files)
+    const files = e.target.files[0];
 
-    // For demo purposes, we'll just store the file objects
-    // In a real app, you would upload these to a server/storage
     setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...files.map((file) => URL.createObjectURL(file))],
+      images: files,
     }))
 
     if (errors.images) {
@@ -85,7 +85,7 @@ const CreateListingPage = () => {
       newErrors.category = "Category is required"
     }
 
-    if (!formData.startingBid || isNaN(formData.startingBid) || Number(formData.startingBid) <= 0) {
+    if (!formData.starting_bid || isNaN(formData.starting_bid) || Number(formData.starting_bid) <= 0) {
       newErrors.startingBid = "Starting bid must be a positive number"
     }
 
@@ -109,15 +109,22 @@ const CreateListingPage = () => {
     try {
       const newProduct = createListing({
         ...formData,
-        startingBid: Number.parseFloat(formData.startingBid),
       })
 
-      if (newProduct) {
-        navigate(`/products/${newProduct.id}`)
-      } else {
-        setErrors({ submit: "Failed to create listing. Please try again." })
-      }
+     
+      setTimeout(()=>{
+        if (newProduct) {
+          // navigate("/products")
+          console.log("success");
+        } else {
+          setErrors({ submit: "Failed to create listing. Please try again." })
+        }
+        toast.success("product created successfully");
+      },2500)
+      
     } catch (error) {
+      
+      toast.error("An error occurred. Please try again");
       setErrors({ submit: "An error occurred. Please try again." })
     } finally {
       setIsSubmitting(false)
@@ -127,7 +134,7 @@ const CreateListingPage = () => {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Create New Listing</h1>
-
+      <h1>{currentUser.id}</h1>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -167,7 +174,7 @@ const CreateListingPage = () => {
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description <span className="text-red-500">*</span>
               </label>
-              <textarea
+             <textarea
                 id="description"
                 name="description"
                 rows={4}
@@ -224,8 +231,8 @@ const CreateListingPage = () => {
                 </div>
                 <input
                   type="number"
-                  id="startingBid"
-                  name="startingBid"
+                  id="starting_bid"
+                  name="starting_bid"
                   min="0.01"
                   step="0.01"
                   value={formData.startingBid}
@@ -313,6 +320,7 @@ const CreateListingPage = () => {
             </div>
           </div>
         </form>
+         <ToastContainer />
       </motion.div>
     </div>
   )
